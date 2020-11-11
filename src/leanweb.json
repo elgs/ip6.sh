@@ -1,0 +1,11 @@
+{
+  "name": "ip6sh",
+  "version": "0.8.9",
+  "components": [
+    "root"
+  ],
+  "imports": [],
+  "resources": [
+    "resources/"
+  ]
+}
