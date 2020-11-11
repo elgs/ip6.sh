@@ -1,12 +1,16 @@
 import LWElement from './../../lib/lw-element.js';
 import ast from './ast.js';
-import ip6 from 'ip6';
 
-customElements.define('ip6sh-root',
+customElements.define('ip6sh-block',
    class extends LWElement {  // LWElement extends HTMLElement
       constructor() {
          super(ast);
-         this.ip6 = ip6;
+      }
+
+      run() {
+         try {
+            this.result = this.fn(this.input);
+         } catch (e) { }
       }
    }
 );

@@ -11,5 +11,8 @@
   "license": "ISC",
   "devDependencies": {
     "@babel/runtime": "^7.12.5"
+  },
+  "dependencies": {
+    "ip6": "^0.1.8"
   }
 }
