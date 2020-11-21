@@ -7,28 +7,28 @@
       <input type="text" lw-model="input" class="input ip" lw-class:is-danger="inputClass==='is-danger'"
          lw-on:input="run()" lw-on:focus="onFocus()">
 
-      <div class="select" lw-if="from">
+      <div class="select" lw-if="from" title="From">
          <select lw-model="from" lw-on:change="run()">
             <option lw-for="item in range()" lw-bind:value="item" lw>'/'+item</option>
          </select>
       </div>
 
-      <div class="select" lw-if="to">
+      <div class="select" lw-if="to" title="To">
          <select lw-model="to" lw-on:change="run()">
             <option lw-for="item in range(from*1 + 1)" lw-bind:value="item" lw>'/'+item</option>
          </select>
       </div>
 
-      <input type="number" class="input limit" lw-model="limit" lw-on:input="run()" lw-if="limit">
+      <input type="number" class="input limit" lw-model="limit" lw-on:input="run()" lw-if="limit" title="Limit">
 
-      <div class="select" lw-if="format">
-         <select lw-model="format" lw-on:change="run()">
-            <option lw-for="item in formats" lw-bind:value="item.value" lw>item.label</option>
+      <div class="select" lw-if="type" title="Output Type">
+         <select lw-model="type" lw-on:change="run()">
+            <option lw-for="item in types" lw-bind:value="item.value" lw>item.label</option>
          </select>
       </div>
 
-      <div class="select" lw-if="showoutput">
-         <select lw-model="output" lw-on:change="run()">
+      <div class="select" lw-if="showformat" title="Output Format">
+         <select lw-model="format" lw-on:change="run()">
             <option lw-for="item in ['Text', 'JSON']" lw-bind:value="item" lw>item</option>
          </select>
       </div>

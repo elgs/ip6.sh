@@ -1,12 +1,14 @@
 {
-  "name": "ip6sh",
-  "version": "0.9.4",
-  "components": [
-    "root",
-    "block"
-  ],
-  "imports": [],
-  "resources": [
-    "resources/"
-  ]
+   "name": "ip6sh",
+   "version": "0.9.4",
+   "components": [
+      "root",
+      "block",
+      "header",
+      "footer"
+   ],
+   "imports": [],
+   "resources": [
+      "resources/"
+   ]
 }
