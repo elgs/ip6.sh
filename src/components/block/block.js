@@ -28,7 +28,15 @@ customElements.define('ip6sh-block',
 
          try {
             const data = this.fn(this.input, this.from, this.to, this.limit, this.format * 1);
-            this.result = JSON.stringify(data, null, 2);
+            if (this.output === 'JSON') {
+               this.result = JSON.stringify(data, null, 2);
+            } else {
+               if (Array.isArray(data)) {
+                  this.result = data.reduce((a, c) => a + c + '\n', '');
+               } else {
+                  this.result = data;
+               }
+            }
             this.inputClass = 'is-success';
          } catch (e) {
             this.result = '';
