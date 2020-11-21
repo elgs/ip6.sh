@@ -1,3 +1,29 @@
-:host {
-   display: block;
+.tool-box {
+  width: 600px;
+  padding: 1.25em;
+}
+
+.center-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.param-box {
+  width: 100%;
+  input.input {
+    margin-bottom: 0.5em;
+  }
+
+  input.limit {
+    width: 100px;
+  }
+}
+
+.result-box {
+  width: 100%;
+  pre > code {
+    font-size: 1.3em;
+  }
 }

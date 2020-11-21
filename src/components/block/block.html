@@ -1,3 +1,37 @@
-<div lw>title</div>
-<input type="text" lw-model="input" class="input" lw-on:input="run(input)">
-<span lw>result</span>
+<div class="card container center-box tool-box">
+   <div class="block">
+      <span lw>name</span>
+   </div>
+
+   <div class="param-box block">
+      <input type="text" lw-model="input" class="input ip" lw-class:is-danger="inputClass==='is-danger'"
+         lw-on:input="run()" lw-on:focus="onFocus()">
+
+      <div class="select" lw-if="from">
+         <select lw-model="from" lw-on:change="run()">
+            <option lw-for="item in range()" lw-bind:value="item" lw>'/'+item</option>
+         </select>
+      </div>
+
+      <div class="select" lw-if="to">
+         <select lw-model="to" lw-on:change="run()">
+            <option lw-for="item in range(from*1 + 1)" lw-bind:value="item" lw>'/'+item</option>
+         </select>
+      </div>
+
+      <input type="number" class="input limit" lw-model="limit" lw-on:input="run()" lw-if="limit">
+
+      <div class="select" lw-if="format">
+         <select lw-model="format" lw-on:change="run()">
+            <option lw-for="item in formats" lw-bind:value="item.value" lw>item.label</option>
+         </select>
+      </div>
+
+   </div>
+
+   <div class="result-box">
+      <pre><code lw>
+      result
+   </code></pre>
+   </div>
+</div>

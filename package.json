@@ -1,16 +1,14 @@
 {
-  "name": "ip6sh",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "devDependencies": {
-    "@babel/runtime": "^7.12.5",
-    "ip6": "^0.1.8"
-  }
+   "name": "ip6sh",
+   "version": "1.0.0",
+   "description": "",
+   "keywords": [],
+   "author": "Qian Chen",
+   "license": "ISC",
+   "devDependencies": {
+      "@babel/runtime": "^7.12.5",
+      "bulma": "^0.9.1",
+      "highlight.js": "^10.4.0",
+      "ip6": "^0.1.8"
+   }
 }

@@ -1,2 +1,20 @@
-<ip6sh-block lw-input:fn="ip6.normalize" lw-input:title="'Normalize'"></ip6sh-block>
-<ip6sh-block lw-input:fn="ip6.abbreviate" lw-input:title="'Abbreviate'"></ip6sh-block>
+<ip6sh-block lw-input:fn="ip6.normalize" lw-input:name="'Normalize'" lw-input:input="'::1'"></ip6sh-block>
+
+<ip6sh-block lw-input:fn="ip6.abbreviate" lw-input:name="'Abbreviate'"
+   lw-input:input="'0000:0000:0000:0000:0000:0000:0000:0001'"></ip6sh-block>
+
+<ip6sh-block lw-input:fn="ip6.divideSubnet" lw-input:range="subnetRange" lw-input:name="'Divide Subnet'"
+   lw-input:input="'2607:5300:60:1234::'" lw-input:from="64" lw-input:to="66" lw-input:limit="8" lw-input:format="0">
+</ip6sh-block>
+
+<ip6sh-block lw-input:fn="ip6.randomSubnet" lw-input:range="subnetRange" lw-input:name="'Random Subnet'"
+   lw-input:input="'2607:5300:60:1234::'" lw-input:from="64" lw-input:to="128" lw-input:limit="8" lw-input:format="0">
+</ip6sh-block>
+
+<ip6sh-block lw-input:fn="ip6.range" lw-input:range="subnetRange" lw-input:name="'Range'"
+   lw-input:input="'2607:5300:60::'" lw-input:from="48" lw-input:to="56"></ip6sh-block>
+
+<ip6sh-block lw-input:fn="ip6.ptr" lw-input:range="ptrRange" lw-input:name="'PTR'"
+   lw-input:input="'2607:5300:60:1234:cafe:babe:dead:beef'" lw-input:from="64"></ip6sh-block>
+
+</ip6sh-block>
