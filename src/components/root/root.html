@@ -1,8 +1,8 @@
 <ip6sh-header></ip6sh-header>
 
-<ip6sh-block lw-input:fn="ip6.normalize" lw-input:name="'Normalize'" lw-input:input="'::1'"></ip6sh-block>
+<ip6sh-block lw-input:fn="ip6.normalize" lw-input:name="'Expand an Address'" lw-input:input="'::1'"></ip6sh-block>
 
-<ip6sh-block lw-input:fn="ip6.abbreviate" lw-input:name="'Abbreviate'"
+<ip6sh-block lw-input:fn="ip6.abbreviate" lw-input:name="'Compress an Address'"
    lw-input:input="'0000:0000:0000:0000:0000:0000:0000:0001'"></ip6sh-block>
 
 <ip6sh-block lw-input:fn="ip6.divideSubnet" lw-input:range="subnetRange" lw-input:name="'Divide Subnet'"

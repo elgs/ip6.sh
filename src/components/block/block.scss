@@ -24,7 +24,20 @@
 
 .result-box {
   width: 100%;
+  position: relative;
   pre > code {
     font-size: 1.3em;
+  }
+  .copy-button {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    font-size: 11px;
+    padding: 4px;
+    color: gray;
+    &:hover {
+      background-color: #b78e6c;
+      color: white;
+    }
   }
 }
