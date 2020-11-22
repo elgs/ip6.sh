@@ -1,24 +1,24 @@
 <ip6sh-header></ip6sh-header>
 
-<ip6sh-block lw-input:fn="ip6.normalize" lw-input:name="'Expand an Address'" lw-input:input="'::1'"></ip6sh-block>
+<ip6sh-block lw-input:fn="ip6.normalize" lw-input:name="'Expand an Address'" lw-input:input="'2001:db8::'"></ip6sh-block>
 
 <ip6sh-block lw-input:fn="ip6.abbreviate" lw-input:name="'Compress an Address'"
-   lw-input:input="'0000:0000:0000:0000:0000:0000:0000:0001'"></ip6sh-block>
+   lw-input:input="'2001:0db8:0000:0000:0000:0000:0000:0000'"></ip6sh-block>
 
 <ip6sh-block lw-input:fn="ip6.divideSubnet" lw-input:range="subnetRange" lw-input:name="'Divide Subnet'"
-   lw-input:input="'2607:5300:60:1234::'" lw-input:from="64" lw-input:to="66" lw-input:limit="8" lw-input:form="0"
+   lw-input:input="'2001:db8::'" lw-input:from="32" lw-input:to="64" lw-input:limit="8" lw-input:form="0"
    lw-input:format="'Text'" lw-input:showformat="'a'">
 </ip6sh-block>
 
 <ip6sh-block lw-input:fn="ip6.randomSubnet" lw-input:range="subnetRange" lw-input:name="'Random Subnet'"
-   lw-input:input="'2607:5300:60:1234::'" lw-input:from="64" lw-input:to="128" lw-input:limit="8" lw-input:form="0"
+   lw-input:input="'2001:db8::'" lw-input:from="32" lw-input:to="64" lw-input:limit="8" lw-input:form="0"
    lw-input:format="'Text'" lw-input:showformat="'a'">
 </ip6sh-block>
 
 <ip6sh-block lw-input:fn="ip6.range" lw-input:range="subnetRange" lw-input:name="'Range'"
-   lw-input:input="'2607:5300:60::'" lw-input:from="48" lw-input:to="56" lw-input:format="'JSON'"></ip6sh-block>
+   lw-input:input="'2001:db8::'" lw-input:from="32" lw-input:to="64" lw-input:format="'JSON'"></ip6sh-block>
 
 <ip6sh-block lw-input:fn="ip6.ptr" lw-input:range="ptrRange" lw-input:name="'PTR'"
-   lw-input:input="'2607:5300:60:1234:cafe:babe:dead:beef'" lw-input:from="64"></ip6sh-block>
+   lw-input:input="'2001:db8::cafe:babe:dead:beef'" lw-input:from="64"></ip6sh-block>
 
 <ip6sh-footer></ip6sh-footer>

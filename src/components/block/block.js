@@ -47,13 +47,9 @@ customElements.define('ip6sh-block',
          }
       }
 
-      copy() {
-         navigator.permissions.query({ name: "clipboard-write" }).then(async result => {
-            if (result.state == "granted" || result.state == "prompt") {
-               await navigator.clipboard.writeText(this.result);
-               getSelection().selectAllChildren(this.shadowRoot.querySelector('.result-box>pre>code'));
-            }
-         });
+      copyResult() {
+         getSelection().selectAllChildren(this.shadowRoot.querySelector('.result-box>pre>code'));
+         document.execCommand("copy");
       }
    }
 );

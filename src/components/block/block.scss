@@ -30,6 +30,7 @@
   }
   .copy-button {
     position: absolute;
+    z-index: 1;
     right: 8px;
     top: 8px;
     font-size: 11px;
