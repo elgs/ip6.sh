@@ -11,7 +11,7 @@ customElements.define('ip6sh-block',
          this.run();
       }
 
-      types = [
+      forms = [
          { label: 'Full', value: 0 },
          { label: 'Short', value: 1 }
       ];
@@ -27,7 +27,10 @@ customElements.define('ip6sh-block',
          }
 
          try {
-            const data = this.fn(this.input, this.from, this.to, this.limit, this.type * 1);
+            if (this.limit < 1) {
+               this.limit = 1;
+            }
+            const data = this.fn(this.input, this.from, this.to, this.limit, this.form * 1);
             if (this.format === 'JSON') {
                this.result = JSON.stringify(data, null, 2);
             } else {

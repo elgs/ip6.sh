@@ -19,11 +19,11 @@
          </select>
       </div>
 
-      <input type="number" class="input limit" lw-model="limit" lw-on:input="run()" lw-if="limit" title="Limit">
+      <input type="number" class="input limit" lw-model="limit" lw-on:input="run()" lw-if="limit" title="Limit" min="1">
 
-      <div class="select" lw-if="type" title="Output Type">
-         <select lw-model="type" lw-on:change="run()">
-            <option lw-for="item in types" lw-bind:value="item.value" lw>item.label</option>
+      <div class="select" lw-if="form" title="Output Form">
+         <select lw-model="form" lw-on:change="run()">
+            <option lw-for="item in forms" lw-bind:value="item.value" lw>item.label</option>
          </select>
       </div>
 
