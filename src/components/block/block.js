@@ -42,6 +42,7 @@ customElements.define('ip6sh-block',
             }
             this.inputClass = 'is-success';
          } catch (e) {
+            console.error(e);
             this.result = '';
             this.inputClass = 'is-danger';
          }
