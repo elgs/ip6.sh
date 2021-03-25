@@ -17,7 +17,9 @@ customElements.define('ip6sh-block',
       ];
 
       onFocus() {
-         this.shadowRoot.querySelector('input.input').select();
+         setTimeout(() => {
+            this.shadowRoot.querySelector('input.input').select();
+         });
       }
 
       run() {
