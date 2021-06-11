@@ -9,7 +9,7 @@
 
       <div class="select" lw-if="from" title="From">
          <select lw-model="from" lw-on:change="run()">
-            <option lw-for="item in range()" lw-bind:value="item" lw>'/'+item</option>
+            <option lw-for="item in range(0, 127)" lw-bind:value="item" lw>'/'+item</option>
          </select>
       </div>
 

@@ -9,8 +9,8 @@ customElements.define('ip6sh-root',
          this.ip6 = ip6;
       }
 
-      subnetRange(from = 1, to = 128) {
-         return [...Array(to).keys()].map(i => i + 1).slice(from - 1);
+      subnetRange(from = 0, to = 128) {
+         return [...Array(to + 1).keys()].slice(from);
       }
 
       ptrRange() {
