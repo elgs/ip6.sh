@@ -6,7 +6,7 @@
    "author": "Qian Chen",
    "license": "ISC",
    "devDependencies": {
-      "@babel/runtime": "^7.15.3",
+      "@babel/runtime": "^7.15.4",
       "bulma": "^0.9.3",
       "ip6": "file:../../js/ip6"
    }
