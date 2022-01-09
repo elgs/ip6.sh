@@ -2,11 +2,14 @@
    "name": "ip6sh",
    "version": "1.0.0",
    "description": "https://ip6.sh",
-   "keywords": [],
+   "keywords": [
+      "ipv6",
+      "ip6"
+   ],
    "author": "Qian Chen",
    "license": "ISC",
    "devDependencies": {
-      "@babel/runtime": "^7.15.4",
+      "@babel/runtime": "^7.16.7",
       "bulma": "^0.9.3",
       "ip6": "file:../../js/ip6"
    }
