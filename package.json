@@ -9,9 +9,9 @@
    "author": "Qian Chen",
    "license": "ISC",
    "devDependencies": {
-      "@babel/runtime": "^7.17.0",
-      "bulma": "^0.9.3",
-      "electron": "^17.0.0",
+      "@babel/runtime": "^7.18.9",
+      "bulma": "^0.9.4",
+      "electron": "^20.0.0",
       "ip6": "file:../../js/ip6"
    }
 }
