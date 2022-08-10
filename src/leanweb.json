@@ -1,6 +1,6 @@
 {
   "name": "ip6sh",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "components": [
     "root",
     "block",
