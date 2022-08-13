@@ -11,7 +11,7 @@
    "devDependencies": {
       "@babel/runtime": "^7.18.9",
       "bulma": "^0.9.4",
-      "electron": "^20.0.1",
+      "electron": "^20.0.2",
       "ip6": "file:../../js/ip6"
    }
 }

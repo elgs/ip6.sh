@@ -77,6 +77,7 @@ globalThis.addEventListener('hashchange', () => {
    leanweb.componentsListeningOnUrlChanges.forEach(component => {
       setTimeout(() => {
          component?.urlHashChanged?.call(component);
+         component?.update?.call(component);
       });
    });
 }, false);
@@ -142,7 +143,6 @@ export default class LWElement extends HTMLElement {
                this._bindModels(rootNode);
                this._bindEvents(rootNode);
                this._bindInputs(rootNode);
-               rootNode.removeAttribute('lw-elem-bind');
             }
             if (rootNode.hasAttribute('lw-if')) {
                this.updateIf(rootNode);
@@ -161,23 +161,22 @@ export default class LWElement extends HTMLElement {
       const treeWalker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT, {
          acceptNode: node => {
             if (node.hasAttribute('lw-elem')) {
-               if (node.hasAttribute('lw-elem-bind')) {
-                  this._bindModels(node);
-                  this._bindEvents(node);
-                  this._bindInputs(node);
-                  node.removeAttribute('lw-elem-bind');
-               }
-               if (node.hasAttribute('lw-if')) {
-                  this.updateIf(node);
-               }
-               if (node.hasAttribute('lw-false')) {
+               if (node.hasAttribute('lw-for')) {
+                  this.updateFor(node);
                   return NodeFilter.FILTER_REJECT;
                }
                if (node.hasAttribute('lw-for-parent')) {
                   return NodeFilter.FILTER_REJECT;
                }
-               if (node.hasAttribute('lw-for')) {
-                  this.updateFor(node);
+               if (node.hasAttribute('lw-elem-bind')) {
+                  this._bindModels(node);
+                  this._bindEvents(node);
+                  this._bindInputs(node);
+               }
+               if (node.hasAttribute('lw-if')) {
+                  this.updateIf(node);
+               }
+               if (node.hasAttribute('lw-false')) {
                   return NodeFilter.FILTER_REJECT;
                }
                this.updateEval(node);
@@ -201,7 +200,13 @@ export default class LWElement extends HTMLElement {
       });
    }
 
+   // properties:
+   // lw_input_bound: boolean
    _bindInputs(inputNode) {
+      if (inputNode['lw_input_bound']) {
+         return;
+      }
+      inputNode['lw_input_bound'] = true;
       for (const attr of inputNode.attributes) {
          const attrName = attr.name;
          const attrValue = attr.value;
@@ -217,31 +222,32 @@ export default class LWElement extends HTMLElement {
    }
 
    // properties:
-   // lw-on:click: true
+   // lw_event_bound: boolean
    _bindEvents(eventNode) {
+      if (eventNode['lw_event_bound']) {
+         return;
+      }
+      eventNode['lw_event_bound'] = true;
       const me = this;
       for (const attr of eventNode.attributes) {
          const attrName = attr.name;
          const attrValue = attr.value;
          if (attrName.startsWith('lw-on:')) {
-            if (eventNode[attrName]) {
-               continue;
-            }
-            eventNode[attrName] = true;
             const interpolation = this.ast[attrValue];
             interpolation.lwValue.split(',').forEach(eventType => {
                eventNode.addEventListener(eventType.trim(), (event => {
                   const context = this._getNodeContext(eventNode);
                   const eventContext = { '$event': event, '$node': eventNode };
                   const parsed = parser.evaluate(interpolation.ast, [eventContext, ...context], interpolation.loc);
-
-                  const promises = parsed.filter(p => typeof p?.then === 'function');
+                  const promises = parsed.filter(p => typeof p?.then === 'function' && typeof p?.finally === 'function');
                   if (parsed.length > promises.length) {
                      me.update();
                   }
-                  if (promises.length > 0) {
-                     Promise.allSettled(promises).then(_ => me.update());
-                  }
+                  promises.forEach(p => {
+                     p?.finally(() => {
+                        me.update();
+                     });
+                  });
                }).bind(me));
             });
          }
@@ -249,16 +255,16 @@ export default class LWElement extends HTMLElement {
    }
 
    // properties:
-   // model_event_bound: boolean
+   // lw_model_bound: boolean
    _bindModels(modelNode) {
       const key = modelNode.getAttribute('lw-model');
       if (!key) {
          return;
       }
-      if (modelNode['model_event_bound']) {
+      if (modelNode['lw_model_bound']) {
          return;
       }
-      modelNode['model_event_bound'] = true;
+      modelNode['lw_model_bound'] = true;
       const interpolation = this.ast[key];
       modelNode.addEventListener('input', (event => {
          const context = this._getNodeContext(modelNode);
