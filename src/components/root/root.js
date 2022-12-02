@@ -1,6 +1,6 @@
 import LWElement from './../../lib/lw-element.js';
 import ast from './ast.js';
-import ip6 from 'ip6/ip6.js';
+import ip6 from 'https://cdn.jsdelivr.net/gh/elgs/ip6/ip6.js';
 
 customElements.define('ip6sh-root',
    class extends LWElement {  // LWElement extends HTMLElement
