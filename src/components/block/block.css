@@ -1,0 +1,48 @@
+.center-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.tool-box {
+  width: 700px;
+  padding: 1.25em;
+  margin: 1.5em auto;
+
+  .param-box {
+    width: 100%;
+
+    & input.input {
+      margin-bottom: 0.5em;
+    }
+
+    & input.limit {
+      width: 100px;
+    }
+  }
+
+  .result-box {
+    width: 100%;
+    position: relative;
+
+    .copy-button {
+      position: absolute;
+      z-index: 1;
+      right: 8px;
+      top: 8px;
+      font-size: 11px;
+      padding: 4px;
+      color: gray;
+
+      &:hover {
+        background-color: #b78e6c;
+        color: white;
+      }
+    }
+
+    & pre>code {
+      font-size: 1.3em;
+    }
+  }
+}

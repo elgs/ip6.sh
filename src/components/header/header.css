@@ -1,0 +1,52 @@
+:host {
+  background-color: #333;
+  height: 50px;
+  gap: 0 20px;
+  align-items: center;
+
+  display: grid;
+  grid-template-columns: 1fr repeat(8, minmax(auto, 80px)) 1fr;
+}
+
+.left {
+  grid-column: 2/6;
+  grid-row: 1;
+  height: 40px;
+  align-items: center;
+  display: flex;
+
+  .brand {
+    margin-left: 10px;
+    color: white;
+    font-weight: 400;
+    font-size: 22px;
+  }
+
+  .version {
+    margin-left: 10px;
+    color: tomato;
+    font-size: 12px;
+    top: -2px;
+    position: relative;
+  }
+}
+
+.right {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  grid-column: 6/10;
+  grid-row: 1;
+
+  .npm {
+    fill: lightgray;
+    width: 32px;
+    margin-left: 20px;
+  }
+
+  .github {
+    fill: lightgray;
+    width: 32px;
+    margin-left: 20px;
+  }
+}
