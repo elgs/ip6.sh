@@ -41,7 +41,7 @@
       }
     }
 
-    & pre>code {
+    pre>code {
       font-size: 1.3em;
     }
   }
