@@ -7,5 +7,8 @@ customElements.define('ip6sh-footer',
          super(ast);
       }
 
+      getFullYear() {
+         return new Date().getFullYear();
+      }
    }
 );

@@ -20,7 +20,7 @@
     color: lightgray;
     font-size: 12px;
 
-    & a {
+    a {
       color: tomato;
     }
   }

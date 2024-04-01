@@ -13,11 +13,11 @@
   .param-box {
     width: 100%;
 
-    & input.input {
+    input.input {
       margin-bottom: 0.5em;
     }
 
-    & input.limit {
+    input.limit {
       width: 100px;
     }
   }
