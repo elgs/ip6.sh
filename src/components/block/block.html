@@ -1,39 +1,32 @@
-<div class="card container center-box tool-box">
+<div class="ui-panel center-box tool-box">
    <div class="block">
       <span lw>name</span>
    </div>
 
    <div class="param-box block">
-      <input type="text" lw-model="input" class="input ip" lw-class:is-danger="inputClass==='is-danger'"
+      <input type="text" lw-model="input" class="ui-input ip" lw-class:error="inputClass==='is-danger'"
          lw-on:input="run()" lw-on:focus="onFocus()">
 
-      <div class="select" lw-if="from" title="From">
-         <select lw-model="from" lw-on:change="run()">
-            <option lw-for="item in range(0, 127)" lw-bind:value="item" lw>'/'+item</option>
-         </select>
-      </div>
+      <select class="ui-select" lw-model="from" lw-on:change="run()" lw-if="from" title="From">
+         <option lw-for="item in range(0, 127)" lw-bind:value="item" lw>'/'+item</option>
+      </select>
 
-      <div class="select" lw-if="to" title="To">
-         <select lw-model="to" lw-on:change="run()">
-            <option lw-for="item in range(from*1 + 1)" lw-bind:value="item" lw>'/'+item</option>
-         </select>
-      </div>
+      <select class="ui-select" lw-model="to" lw-on:change="run()" lw-if="to" title="To">
+         <option lw-for="item in range(from*1 + 1)" lw-bind:value="item" lw>'/'+item</option>
+      </select>
 
-      <input type="number" class="input limit" lw-model="limit" lw-on:input="run()" lw-if="limit" title="Limit" min="1">
+      <input type="number" class="ui-input limit" lw-model="limit" lw-on:input="run()" lw-if="limit" title="Limit"
+         min="1">
 
-      <div class="select" lw-if="form" title="Output Form">
-         <select lw-model="form" lw-on:change="run()">
-            <option lw-for="item in forms" lw-bind:value="item.value" lw>item.label</option>
-         </select>
-      </div>
+      <select class="ui-select" lw-model="form" lw-on:change="run()" lw-if="form" title="Output Form">
+         <option lw-for="item in forms" lw-bind:value="item.value" lw>item.label</option>
+      </select>
 
-      <div class="select" lw-if="showformat" title="Output Format">
-         <select lw-model="format" lw-on:change="run()">
-            <option lw-for="item in ['Text', 'JSON']" lw-bind:value="item" lw>item</option>
-         </select>
-      </div>
+      <select class="ui-select" lw-model="format" lw-on:change="run()" lw-if="showformat" title="Output Format">
+         <option lw-for="item in ['Text', 'JSON']" lw-bind:value="item" lw>item</option>
+      </select>
 
-      <button class="button" lw-on:click="run()" lw lw-if="runbuttontext">runbuttontext</button>
+      <button class="ui-btn" lw-on:click="run()" lw lw-if="runbuttontext">runbuttontext</button>
    </div>
 
    <div class="result-box">

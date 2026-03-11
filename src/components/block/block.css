@@ -1,3 +1,8 @@
+:host {
+  display: block;
+  font-family: var(--ui-font);
+}
+
 .center-box {
   display: flex;
   flex-direction: column;
@@ -10,27 +15,52 @@
   padding: 1.25em;
   margin: 1.5em auto;
 
+  .block {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 0.75rem;
+
+    &:not(.param-box) {
+      text-align: center;
+    }
+  }
+
   .param-box {
     width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5em;
 
-    input.input {
-      margin-bottom: 0.5em;
+    .ui-input.ip {
+      width: 100%;
     }
 
-    input.limit {
+    .ui-select {
+      width: auto;
+    }
+
+    .ui-input.limit {
       width: 100px;
     }
   }
 
   .result-box {
+    box-sizing: border-box;
     width: 100%;
     position: relative;
+    margin-top: 1rem;
+    padding: 0.875rem 1rem;
+    background: var(--ui-bg-subtle);
+    border: 1px solid var(--ui-border);
+    border-radius: var(--ui-radius);
 
     .copy-button {
       position: absolute;
       z-index: 1;
       right: 8px;
       top: 8px;
+      cursor: pointer;
       font-size: 11px;
       padding: 4px;
       color: gray;
@@ -39,6 +69,11 @@
         background-color: #b78e6c;
         color: white;
       }
+    }
+
+    pre {
+      margin: 0;
+      color: var(--ui-text);
     }
 
     pre>code {
