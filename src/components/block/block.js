@@ -50,8 +50,8 @@ customElements.define('ip6sh-block',
       }
 
       copyResult() {
-         getSelection().selectAllChildren(this.shadowRoot.querySelector('.result-box>pre>code'));
-         document.execCommand("copy");
+         const text = this.shadowRoot.querySelector('.result-box>pre>code').innerText;
+         navigator.clipboard.writeText(text.trim());
       }
    }
 );

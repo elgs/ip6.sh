@@ -77,7 +77,8 @@
     }
 
     pre>code {
-      font-size: 1.3em;
+      font-family: var(--ui-font-mono);
+      font-size: 0.9rem;
     }
   }
 }
