@@ -106,8 +106,17 @@ export default class LWElement extends HTMLElement {
     leanweb.builderVersion = ast.builderVersion;
 
     const node = document.createElement('template');
-    node.innerHTML = `<style>${ast.css}</style>${ast.html}`;
+    const componentSheet = new CSSStyleSheet();
+    componentSheet.replaceSync(ast.css);
+    node.innerHTML = ast.html;
     this.attachShadow({ mode: 'open' }).appendChild(node.content);
+    this.shadowRoot.adoptedStyleSheets = [globalThis.__lw_globalStyleSheet, componentSheet];
+    globalThis.__lw_globalStyleImports?.forEach(url => {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = url;
+      this.shadowRoot.appendChild(link);
+    });
 
     this._bindMethods();
     setTimeout(() => {
