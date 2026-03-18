@@ -22,6 +22,19 @@
 
    <ip6sh-block lw-input:fn="ip6.ptr" lw-input:range="ptrRange" lw-input:name="'PTR'"
       lw-input:input="'2001:db8::cafe:babe:dead:beef'" lw-input:from="64"></ip6sh-block>
+
+   <ip6sh-block lw-input:fn="ip6.divideSubnet4" lw-input:range="subnet4Range" lw-input:name="'Divide an IPv4 Subnet'"
+      lw-input:input="'192.168.0.0'" lw-input:from="16" lw-input:to="24" lw-input:limit="8" lw-input:form="0"
+      lw-input:format="'Text'" lw-input:showformat="true">
+   </ip6sh-block>
+
+   <ip6sh-block lw-input:fn="ip6.randomSubnet4" lw-input:range="subnet4Range" lw-input:name="'Random IPv4 Subnets'"
+      lw-input:input="'192.168.0.0'" lw-input:from="16" lw-input:to="24" lw-input:limit="8" lw-input:form="0"
+      lw-input:format="'Text'" lw-input:showformat="true" lw-input:runbuttontext="'Roll'">
+   </ip6sh-block>
+
+   <ip6sh-block lw-input:fn="ip6.range4" lw-input:range="subnet4Range" lw-input:name="'IPv4 Range'"
+      lw-input:input="'192.168.0.0'" lw-input:from="16" lw-input:to="24" lw-input:format="'JSON'"></ip6sh-block>
 </div>
 
 <ip6sh-footer></ip6sh-footer>

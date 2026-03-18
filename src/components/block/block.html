@@ -8,7 +8,7 @@
          lw-on:input="run()" lw-on:focus="onFocus()">
 
       <select class="ui-select" lw-model="from" lw-on:change="run()" lw-if="from" title="From">
-         <option lw-for="item in range(0, 127)" lw-bind:value="item" lw>'/'+item</option>
+         <option lw-for="item in range(0)" lw-bind:value="item" lw>'/'+item</option>
       </select>
 
       <select class="ui-select" lw-model="to" lw-on:change="run()" lw-if="to" title="To">

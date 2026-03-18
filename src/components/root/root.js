@@ -1,6 +1,6 @@
 import LWElement from './../../lib/lw-element.js';
 import ast from './ast.js';
-import ip6 from 'https://cdn.jsdelivr.net/gh/elgs/ip6/ip6.js';
+import ip6 from 'https://cdn.jsdelivr.net/gh/elgs/ip6@0.2.12/ip6.js';
 
 customElements.define('ip6sh-root',
    class extends LWElement {  // LWElement extends HTMLElement
@@ -10,6 +10,10 @@ customElements.define('ip6sh-root',
       }
 
       subnetRange(from = 0, to = 128) {
+         return [...Array(to + 1).keys()].slice(from);
+      }
+
+      subnet4Range(from = 0, to = 32) {
          return [...Array(to + 1).keys()].slice(from);
       }
 
