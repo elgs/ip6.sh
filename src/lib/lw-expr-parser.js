@@ -24,23 +24,25 @@ const binaryOperations = {
   //  '|>': (a, b) => a |> b,
 };
 
+// Each operation returns the assigned value, matching JS assignment
+// expression semantics (so chained assignments like a = b = 1 work).
 const assignmentOperations = {
-  '=': (c, a, b) => { c[a] = b; },
-  '+=': (c, a, b) => { c[a] += b; },
-  '-=': (c, a, b) => { c[a] -= b; },
-  '*=': (c, a, b) => { c[a] *= b; },
-  '/=': (c, a, b) => { c[a] /= b; },
-  '%=': (c, a, b) => { c[a] %= b; },
-  '**=': (c, a, b) => { c[a] **= b; },
-  '&&=': (c, a, b) => { c[a] &&= b; },
-  '??=': (c, a, b) => { c[a] ??= b; },
-  '||=': (c, a, b) => { c[a] ||= b; },
-  '>>=': (c, a, b) => { c[a] >>= b; },
-  '>>>=': (c, a, b) => { c[a] >>>= b; },
-  '<<=': (c, a, b) => { c[a] <<= b; },
-  '&=': (c, a, b) => { c[a] &= b; },
-  '|=': (c, a, b) => { c[a] |= b; },
-  '^=': (c, a, b) => { c[a] ^= b; },
+  '=': (c, a, b) => c[a] = b,
+  '+=': (c, a, b) => c[a] += b,
+  '-=': (c, a, b) => c[a] -= b,
+  '*=': (c, a, b) => c[a] *= b,
+  '/=': (c, a, b) => c[a] /= b,
+  '%=': (c, a, b) => c[a] %= b,
+  '**=': (c, a, b) => c[a] **= b,
+  '&&=': (c, a, b) => c[a] &&= b,
+  '??=': (c, a, b) => c[a] ??= b,
+  '||=': (c, a, b) => c[a] ||= b,
+  '>>=': (c, a, b) => c[a] >>= b,
+  '>>>=': (c, a, b) => c[a] >>>= b,
+  '<<=': (c, a, b) => c[a] <<= b,
+  '&=': (c, a, b) => c[a] &= b,
+  '|=': (c, a, b) => c[a] |= b,
+  '^=': (c, a, b) => c[a] ^= b,
 };
 
 
@@ -65,7 +67,8 @@ const updateOperators = (operator, prefix) => {
 
 const callFunction = (node, context) => {
   const callee = evalNode(node.callee, context);
-  if (node.callee.type === 'OptionalMemberExpression' && (callee === void 0 || callee === null)) {
+  if ((callee === void 0 || callee === null) &&
+    (node.type === 'OptionalCallExpression' || node.callee.type === 'OptionalMemberExpression')) {
     return void 0;
   }
   const args = [];
@@ -103,7 +106,7 @@ const nodeHandlers = {
     } else {
       throw new Error('Unsupported assignment left-hand side');
     }
-    assignmentOperations[node.operator](obj, prop, evalNode(node.right, context));
+    return assignmentOperations[node.operator](obj, prop, evalNode(node.right, context));
   },
   'LogicalExpression': (node, context) => {
     const left = evalNode(node.left, context);

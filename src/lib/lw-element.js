@@ -101,19 +101,36 @@ export default class LWElement extends HTMLElement {
 
     leanweb.runtimeVersion = ast.runtimeVersion;
     leanweb.builderVersion = ast.builderVersion;
+    leanweb.componentPrefix ??= ast.componentFullName.split('-')[0] + '-';
 
     const node = document.createElement('template');
-    const componentSheet = new CSSStyleSheet();
-    componentSheet.replaceSync(ast.css);
     node.innerHTML = ast.html;
-    this.attachShadow({ mode: 'open' }).appendChild(node.content);
-    this.shadowRoot.adoptedStyleSheets = [globalThis.leanweb.__lw_globalStyleSheet, componentSheet].filter(Boolean);
-    globalThis.leanweb.__lw_globalStyleImports?.forEach(url => {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = url;
-      this.shadowRoot.appendChild(link);
-    });
+
+    if (ast.shadowDom) {
+      const componentSheet = new CSSStyleSheet();
+      componentSheet.replaceSync(ast.css);
+      this.attachShadow({ mode: 'open' }).appendChild(node.content);
+      this.shadowRoot.adoptedStyleSheets = [globalThis.leanweb.__lw_globalStyleSheet, componentSheet].filter(Boolean);
+      globalThis.leanweb.__lw_globalStyleImports?.forEach(url => {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = url;
+        this.shadowRoot.appendChild(link);
+      });
+      this._root = this.shadowRoot;
+    } else {
+      this.appendChild(node.content);
+      if (!LWElement._injectedStyles) {
+        LWElement._injectedStyles = new Set();
+      }
+      if (!LWElement._injectedStyles.has(ast.componentFullName)) {
+        LWElement._injectedStyles.add(ast.componentFullName);
+        const style = document.createElement('style');
+        style.textContent = ast.css;
+        document.head.appendChild(style);
+      }
+      this._root = this;
+    }
 
     this._bindMethods();
     setTimeout(() => {
@@ -127,36 +144,76 @@ export default class LWElement extends HTMLElement {
       }
     });
 
+    this._ifPlaceholders = new Set();
+    this._eventBusListeners = [];
+    this._registerListeners();
+  }
+
+  _registerListeners() {
+    this._eventBusListeners.push(leanweb.eventBus.addEventListener('update', _ => {
+      this.update();
+    }));
+    this._eventBusListeners.push(leanweb.eventBus.addEventListener(this.ast.componentFullName, _ => {
+      this.update();
+    }));
     if (this.urlHashChanged && typeof this.urlHashChanged === 'function') {
       leanweb.componentsListeningOnUrlChanges.push(this);
     }
+  }
 
-    leanweb.eventBus.addEventListener('update', _ => {
-      this.update();
-    });
+  connectedCallback() {
+    if (this._eventBusListeners.length === 0) {
+      this._registerListeners();
+    }
+  }
 
-    leanweb.eventBus.addEventListener(ast.componentFullName, _ => {
-      this.update();
+  disconnectedCallback() {
+    const idx = leanweb.componentsListeningOnUrlChanges.indexOf(this);
+    if (idx > -1) {
+      leanweb.componentsListeningOnUrlChanges.splice(idx, 1);
+    }
+    this._eventBusListeners?.forEach(listener => {
+      leanweb.eventBus.removeEventListener(listener);
     });
+    this._eventBusListeners = [];
   }
 
   _getNodeContext(node) {
     const contextNode = node.closest('[lw-context]');
-    return contextNode?.['lw-context'] ?? [{ 'this': this }, this, globalThis];
+    // contextNode must be inside this component's root, not the root itself.
+    // In non-shadow DOM, the component element (this._root === this) may carry
+    // a [lw-context] set by a parent's lw-for — that context belongs to the
+    // parent, not this component.
+    if (contextNode && contextNode !== this._root && this._root.contains(contextNode)) {
+      return contextNode['lw-context'];
+    }
+    return [{ 'this': this }, this, globalThis];
   }
 
-  update(rootNode = this.shadowRoot) {
-    if (rootNode !== this.shadowRoot) {
+  update(rootNode = this._root) {
+    // Restore any lw-if placeholders whose condition is now true before
+    // walking the tree, so the restored elements get processed normally.
+    this._restoreIfPlaceholders();
+
+    // Process rootNode itself when called from updateFor with a cloned node.
+    // TreeWalker never visits its own root, so we handle it manually here.
+    // Skipped when rootNode === this._root because the component's own root
+    // element is owned by the parent component's TreeWalker, not ours.
+    // Nodes whose lw-if evaluated to false.  We defer DOM removal until
+    // after the TreeWalker finishes so we don't detach the walker's current
+    // navigation pointer (which would stop the walk).
+    const toRemove = [];
+
+    if (rootNode !== this._root) {
       if (rootNode.hasAttribute('lw-elem')) {
         if (rootNode.hasAttribute('lw-elem-bind')) {
           this._bindModels(rootNode);
           this._bindEvents(rootNode);
           this._bindInputs(rootNode);
         }
-        if (rootNode.hasAttribute('lw-if')) {
-          this.updateIf(rootNode);
-        }
-        if (!rootNode.hasAttribute('lw-false')) {
+        if (rootNode.hasAttribute('lw-if') && !this.updateIf(rootNode)) {
+          toRemove.push(rootNode);
+        } else {
           this.updateEval(rootNode);
           this.updateClass(rootNode);
           this.updateBind(rootNode);
@@ -167,6 +224,17 @@ export default class LWElement extends HTMLElement {
         }
       }
     }
+    // If rootNode is a child component (called from updateFor on a component
+    // element), don't walk its descendants — they belong to the child's own
+    // AST and will be updated by the child's own update() cycle.
+    if (rootNode !== this._root && rootNode.localName.startsWith(leanweb.componentPrefix)) {
+      this._applyIfRemovals(toRemove);
+      return;
+    }
+    // Walk all descendant elements and process lw-* directives.
+    // With shadow DOM, the shadow boundary naturally prevents walking into
+    // child components. Without shadow DOM, we check for child components
+    // by tag name (see FILTER_REJECT below) to mimic that boundary.
     const treeWalker = document.createTreeWalker(rootNode, NodeFilter.SHOW_ELEMENT, {
       acceptNode: node => {
         if (node.hasAttribute('lw-elem')) {
@@ -182,10 +250,8 @@ export default class LWElement extends HTMLElement {
             this._bindEvents(node);
             this._bindInputs(node);
           }
-          if (node.hasAttribute('lw-if')) {
-            this.updateIf(node);
-          }
-          if (node.hasAttribute('lw-false')) {
+          if (node.hasAttribute('lw-if') && !this.updateIf(node)) {
+            toRemove.push(node);
             return NodeFilter.FILTER_REJECT;
           }
           this.updateEval(node);
@@ -193,10 +259,25 @@ export default class LWElement extends HTMLElement {
           this.updateBind(node);
           this.updateModel(node);
         }
+        // Light DOM boundary: in non-shadow DOM mode, the child component's
+        // internal DOM is in the light DOM, so FILTER_REJECT prevents walking
+        // into it. In shadow DOM mode, the shadow boundary already isolates
+        // child internals, and we must not reject here so the TreeWalker can
+        // still visit slotted content (light DOM children owned by this parent).
+        if (!this.ast.shadowDom && node !== rootNode && node.localName.startsWith(leanweb.componentPrefix)) {
+          return NodeFilter.FILTER_REJECT;
+        }
         return NodeFilter.FILTER_ACCEPT;
       }
     });
     while (treeWalker.nextNode()) { }
+    this._applyIfRemovals(toRemove);
+  }
+
+  _applyIfRemovals(toRemove) {
+    for (const node of toRemove) {
+      this._removeIfNode(node);
+    }
   }
 
   _bindMethods() {
@@ -205,7 +286,20 @@ export default class LWElement extends HTMLElement {
     methodNames.push(...Object.getOwnPropertyNames(proto).filter(name => hasMethod(proto, name)));
     methodNames.push(...Object.getOwnPropertyNames(this).filter(name => hasMethod(this, name)));
     methodNames.filter(name => name !== 'constructor').forEach(name => {
-      this[name] = this[name].bind(this);
+      const bound = this[name].bind(this);
+      if (bound[Symbol.toStringTag] === 'AsyncFunction') {
+        this[name] = (...args) => {
+          const result = bound(...args);
+          // finally must attach directly to result so update() runs before
+          // the caller's own await continuation; the trailing catch keeps
+          // this side chain from re-reporting a rejection the caller already
+          // handles on the returned promise.
+          result.finally(() => this.update()).catch(() => { });
+          return result;
+        };
+      } else {
+        this[name] = bound;
+      }
     });
   }
 
@@ -226,8 +320,8 @@ export default class LWElement extends HTMLElement {
         inputNode[interpolation.lwValue] = parsed[0];
       }
     }
-    inputNode?.inputReady?.call(this);
-    inputNode?.update?.call(this);
+    inputNode?.inputReady?.call(inputNode);
+    inputNode?.update?.call(inputNode);
   }
 
   // properties:
@@ -237,27 +331,20 @@ export default class LWElement extends HTMLElement {
       return;
     }
     eventNode['lw_event_bound'] = true;
-    const me = this;
     for (const attr of eventNode.attributes) {
       const attrName = attr.name;
       const attrValue = attr.value;
       if (attrName.startsWith('lw-on:')) {
         const interpolation = this.ast[attrValue];
         interpolation.lwValue.split(',').forEach(eventType => {
-          eventNode.addEventListener(eventType.trim(), (event => {
+          eventNode.addEventListener(eventType.trim(), event => {
             const context = this._getNodeContext(eventNode);
             const eventContext = { '$event': event, '$node': eventNode };
             const parsed = parser.evaluate(interpolation.ast, [eventContext, ...context], interpolation.loc);
-            const promises = parsed.filter(p => typeof p?.then === 'function' && typeof p?.finally === 'function');
-            if (parsed.length > promises.length) {
-              me.update();
+            if (parsed.some(p => typeof p?.then !== 'function')) {
+              this.update();
             }
-            promises.forEach(p => {
-              p?.finally(() => {
-                me.update();
-              });
-            });
-          }).bind(me));
+          });
         });
       }
     }
@@ -292,7 +379,10 @@ export default class LWElement extends HTMLElement {
       if (modelNode.type === 'number' || modelNode.type === 'range') {
         // set do_not_update mark for cases when user inputs 0.01, 0.0 will not be evaluated prematurely
         modelNode.do_not_update = true;
-        object[propertyExpr] = modelNode.value * 1;
+        // valueAsNumber is NaN for an empty or partially-typed field; map it
+        // to null so clearing the input doesn't coerce the model to 0.
+        const parsedNumber = modelNode.valueAsNumber;
+        object[propertyExpr] = Number.isNaN(parsedNumber) ? null : parsedNumber;
       } else if (modelNode.type === 'checkbox') {
         if (Array.isArray(object[propertyExpr])) {
           if (modelNode.checked) {
@@ -383,27 +473,54 @@ export default class LWElement extends HTMLElement {
   }
 
   // attribute: lw-if: astKey
-  // lw-false: '' (if false)
+  // Returns true if the condition is true (element should stay), false if the
+  // element should be removed.  The actual DOM removal is deferred so it
+  // doesn't break the TreeWalker's navigation during the walk.
   updateIf(ifNode) {
     const key = ifNode.getAttribute('lw-if');
     if (!key) {
-      return;
+      return true;
     }
     const context = this._getNodeContext(ifNode);
     const interpolation = this.ast[key];
     const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
+    return !!parsed[0];
+  }
 
-    const hasLwFalse = ifNode.hasAttribute('lw-false');
-    if (parsed[0]) {
-      hasLwFalse && ifNode.removeAttribute('lw-false');
-      setTimeout(() => {
-        ifNode.turnedOn?.call(ifNode);
-      });
-    } else {
-      !hasLwFalse && ifNode.setAttribute('lw-false', '');
-      setTimeout(() => {
-        ifNode.turnedOff?.call(ifNode);
-      });
+  // Replace an element with a comment placeholder.
+  _removeIfNode(ifNode) {
+    const placeholder = document.createComment('lw-if');
+    placeholder['lw-if-element'] = ifNode;
+    ifNode.parentNode.replaceChild(placeholder, ifNode);
+    this._ifPlaceholders.add(placeholder);
+    setTimeout(() => {
+      ifNode.turnedOff?.call(ifNode);
+    });
+  }
+
+  // Restores lw-if placeholders whose condition has become true.
+  _restoreIfPlaceholders() {
+    for (const placeholder of this._ifPlaceholders) {
+      if (!this._root.contains(placeholder)) {
+        this._ifPlaceholders.delete(placeholder);
+        continue;
+      }
+      const ifNode = placeholder['lw-if-element'];
+      const key = ifNode.getAttribute('lw-if');
+      if (!key) continue;
+      // The removed node is detached, so its own context lookup would miss
+      // any enclosing lw-for scope; resolve the context from the placeholder's
+      // position in the live tree instead.
+      const context = this._getNodeContext(placeholder.parentElement ?? ifNode);
+      const interpolation = this.ast[key];
+      const parsed = parser.evaluate(interpolation.ast, context, interpolation.loc);
+      if (parsed[0]) {
+        placeholder.parentNode.replaceChild(ifNode, placeholder);
+        this._ifPlaceholders.delete(placeholder);
+        setTimeout(() => {
+          ifNode.turnedOn?.call(ifNode);
+        });
+      }
     }
   }
 
@@ -501,9 +618,6 @@ export default class LWElement extends HTMLElement {
         node.setAttribute('lw-for-parent', key);
         node.setAttribute('lw-context', '');
         currentNode.insertAdjacentElement('afterend', node);
-      }
-      if (item && typeof item === 'object') {
-        item.getDom = () => node;
       }
       currentNode = node;
       const itemContext = { [interpolation.itemExpr]: item };
